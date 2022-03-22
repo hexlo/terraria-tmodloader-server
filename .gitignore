@@ -1,0 +1,7 @@
+terraria-server.zip
+terraria-server/
+docker-compose.yml
+!Dockerfile
+
+Worlds/*
+!Worlds/.gitkeep
