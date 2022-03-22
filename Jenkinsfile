@@ -3,6 +3,7 @@ pipeline {
     userName = "hexlo"
     imageName = "terraria-tmodloader-server"
     imageTag = 'latest'
+    githubTag = ''
     gitBranch = 'main'
     gitRepo = "https://github.com/${userName}/${imageName}.git"
     dockerhubRegistry = "${userName}/${imageName}"
@@ -15,10 +16,11 @@ pipeline {
     githubImage = ''
     
     versionTag = ''
+    terrariaVersion = ''
   }
   agent any
   triggers {
-    cron('H H(4-8) * * *')
+    cron('H H(4-6) * * *')
   }
   stages {
     stage('Cloning Git') {
@@ -31,7 +33,17 @@ pipeline {
         script {
 
           date = sh "echo \$(date +%Y-%m-%d:%H:%M:%S)"
-          echo "date=$date"
+          echo "date=${date}"
+
+          terrariaVersion = sh(script: "${WORKSPACE}/scripts/get-terraria-version.sh", , returnStdout: true).trim()
+          echo "terrariaVersion=${terrariaVersion}"
+
+          tmodloaderVersion = sh(script: "${WORKSPACE}/scripts/get-tmodloader-version.sh", , returnStdout: true).trim()
+          echo "tmodloaderVersion=${tmodloaderVersion}"
+
+          githubTag = sh(script: "git tag --sort version:refname | tail -1", , returnStdout: true).trim()
+          echo "githubTag=${githubTag}"
+
           // Docker Hub
           dockerhubImage = docker.build( "${dockerhubRegistry}:${imageTag}", "--no-cache --build-arg CACHE_DATE=$date ." )
           // Github
