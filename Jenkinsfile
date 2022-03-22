@@ -32,7 +32,7 @@ pipeline {
       steps{
         script {
 
-          date = sh "date +%Y-%m-%d:%H:%M:%S"
+          date = sh(returnStdout:true, script: "date +%Y-%m-%d:%H:%M:%S")
           echo "date=${date}"
 
           terrariaVersion = sh(script: "${WORKSPACE}/.scripts/get-terraria-version.sh", , returnStdout: true).trim()
@@ -45,9 +45,9 @@ pipeline {
           echo "githubTag=${githubTag}"
 
           // Docker Hub
-          dockerhubImage = docker.build( "${dockerhubRegistry}:${imageTag}", "--no-cache --build-arg CACHE_DATE=$date ." )
+          dockerhubImage = docker.build( "${dockerhubRegistry}:${imageTag}", "--no-cache ." )
           // Github
-          githubImage = docker.build( "${githubRegistry}:${imageTag}", "--no-cache --build-arg CACHE_DATE=$date ." )
+          githubImage = docker.build( "${githubRegistry}:${imageTag}", "--no-cache ." )
         }
       }
     }
@@ -57,26 +57,36 @@ pipeline {
           try {
             // Docker Hub
             // Check if DockerHub tag exists
-            canPushDHTag = sh "docker manifest inspect ${dockerhubRegistry}:${githubTag} > /dev/null 2>&1; echo \$?"
-            echo "canPushDockerhubTag=${canPushDockerhubTag}"
+            catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+              canPushDockerhubTag = sh(
+                script: "! docker manifest inspect ${dockerhubRegistry}:${githubTag} > /dev/null 2>&1; echo \$?;",
+                returnStatus:true
+              ) == 0
+              echo "canPushDockerhubTag: ${canPushDockerhubTag}"
+            }
 
             docker.withRegistry( '', "${dockerhubCredentials}" ) {
               dockerhubImage.push()
 
-              if (canPushDockerhubTag == 1) {
+              if (canPushDockerhubTag) {
                 dockerhubImage.push("${githubTag}")
               }
             }
 
             // Github
             // Check if Github tag exists
-            canPushGithubTag = sh "docker manifest inspect ${githubRegistry}:${githubTag} > /dev/null 2>&1; echo \$?",
-            echo "canPushGithubTag=${canPushGithubTag}"
+            catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+              canPushGithubTag = sh(
+                script: "! docker manifest inspect ${githubRegistry}:${githubTag} > /dev/null 2>&1; echo \$?",
+                returnStatus:true
+                ) == 0
+              echo "canPushGithubTag: ${canPushGithubTag}"
+            }
 
             docker.withRegistry("https://${githubRegistry}", "${githubCredentials}" ) {
               githubImage.push()
               
-              if (canPushGithubTag == 1) {
+              if (canPushGithubTag) {
                 githubImage.push("${githubTag}")
               }
             }
