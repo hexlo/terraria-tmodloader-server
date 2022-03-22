@@ -63,7 +63,7 @@ pipeline {
             docker.withRegistry( '', "${dockerhubCredentials}" ) {
               dockerhubImage.push()
 
-              if (canPushDockerhubTag) {
+              if (canPushDockerhubTag == 1) {
                 dockerhubImage.push("${githubTag}")
               }
             }
@@ -76,7 +76,7 @@ pipeline {
             docker.withRegistry("https://${githubRegistry}", "${githubCredentials}" ) {
               githubImage.push()
               
-              if (canPushGithubTag) {
+              if (canPushGithubTag == 1) {
                 githubImage.push("${githubTag}")
               }
             }
