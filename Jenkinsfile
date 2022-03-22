@@ -55,12 +55,29 @@ pipeline {
       steps{
         script {
           // Docker Hub
+          // Check if DockerHub tag exists
+          canPushDHTag = sh(script: "docker manifest inspect ${dockerhubRegistry}:${githubTag} > /dev/null 2>&1; echo $?", , returnStdout: true).trim()
+          echo "canPushDockerhubTag=${canPushDockerhubTag}"
+
           docker.withRegistry( '', "${dockerhubCredentials}" ) {
             dockerhubImage.push()
+
+            if (canPushDockerhubTag) {
+              dockerhubImage.push("${githubTag}")
+            }
           }
+
           // Github
+          // Check if Github tag exists
+          canPushGithubTag = sh(script: "docker manifest inspect ${githubRegistry}:${githubTag} > /dev/null 2>&1; echo $?", , returnStdout: true).trim()
+          echo "canPushGithubTag=${canPushGithubTag}"
+
           docker.withRegistry("https://${githubRegistry}", "${githubCredentials}" ) {
             githubImage.push()
+            
+            if (canPushGithubTag) {
+              githubImage.push("${githubTag}")
+            }
           }
         }
       }
@@ -68,11 +85,12 @@ pipeline {
     stage('Remove Unused docker image') {
       steps{
         catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-          // Docker Hub
-          sh "docker rmi ${dockerhubRegistry}:${imageTag}"
+          sh "docker system prune -f"
+          // // Docker Hub
+          // sh "docker rmi ${dockerhubRegistry}:${imageTag}"
         
-          // Github
-          sh "docker rmi ${githubRegistry}:${imageTag}"
+          // // Github
+          // sh "docker rmi ${githubRegistry}:${imageTag}"
         }
       }
     }
