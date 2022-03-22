@@ -56,7 +56,7 @@ pipeline {
         script {
           // Docker Hub
           // Check if DockerHub tag exists
-          canPushDHTag = sh(script: "docker manifest inspect ${dockerhubRegistry}:${githubTag} > /dev/null 2>&1; echo \$?", , returnStdout: true).trim()
+          canPushDHTag = sh "docker manifest inspect ${dockerhubRegistry}:${githubTag} > /dev/null 2>&1; echo \$?"
           echo "canPushDockerhubTag=${canPushDockerhubTag}"
 
           docker.withRegistry( '', "${dockerhubCredentials}" ) {
@@ -69,7 +69,7 @@ pipeline {
 
           // Github
           // Check if Github tag exists
-          canPushGithubTag = sh(script: "docker manifest inspect ${githubRegistry}:${githubTag} > /dev/null 2>&1; echo \$?", , returnStdout: true).trim()
+          canPushGithubTag = sh "docker manifest inspect ${githubRegistry}:${githubTag} > /dev/null 2>&1; echo \$?",
           echo "canPushGithubTag=${canPushGithubTag}"
 
           docker.withRegistry("https://${githubRegistry}", "${githubCredentials}" ) {
