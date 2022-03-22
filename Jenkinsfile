@@ -32,13 +32,13 @@ pipeline {
       steps{
         script {
 
-          date = sh "echo \$(date +%Y-%m-%d:%H:%M:%S)"
+          date = sh "date +%Y-%m-%d:%H:%M:%S"
           echo "date=${date}"
 
-          terrariaVersion = sh(script: "${WORKSPACE}/scripts/get-terraria-version.sh", , returnStdout: true).trim()
+          terrariaVersion = sh(script: "${WORKSPACE}/.scripts/get-terraria-version.sh", , returnStdout: true).trim()
           echo "terrariaVersion=${terrariaVersion}"
 
-          tmodloaderVersion = sh(script: "${WORKSPACE}/scripts/get-tmodloader-version.sh", , returnStdout: true).trim()
+          tmodloaderVersion = sh(script: "${WORKSPACE}/.scripts/get-mod-version.sh https://github.com/tModLoader/tModLoader/releases/latest", , returnStdout: true).trim()
           echo "tmodloaderVersion=${tmodloaderVersion}"
 
           githubTag = sh(script: "git tag --sort version:refname | tail -1", , returnStdout: true).trim()
