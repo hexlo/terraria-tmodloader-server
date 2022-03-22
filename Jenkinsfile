@@ -41,7 +41,7 @@ pipeline {
           tmodloaderVersion = sh(script: "${WORKSPACE}/.scripts/get-mod-version.sh https://github.com/tModLoader/tModLoader/releases/latest", , returnStdout: true).trim()
           echo "tmodloaderVersion=${tmodloaderVersion}"
 
-          githubTag = sh(script: "git tag --sort version:refname | tail -1", , returnStdout: true).trim()
+          githubTag = sh(script: "git tag --sort version:refname | tail -1 | sed 's#v##'", , returnStdout: true).trim()
           echo "githubTag=${githubTag}"
 
           // Docker Hub
