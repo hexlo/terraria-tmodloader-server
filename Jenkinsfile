@@ -54,31 +54,33 @@ pipeline {
     stage('Deploy Image') {
       steps{
         script {
-          // Docker Hub
-          // Check if DockerHub tag exists
-          canPushDHTag = sh "docker manifest inspect ${dockerhubRegistry}:${githubTag} > /dev/null 2>&1; echo \$?"
-          echo "canPushDockerhubTag=${canPushDockerhubTag}"
+          try {
+            // Docker Hub
+            // Check if DockerHub tag exists
+            canPushDHTag = sh "docker manifest inspect ${dockerhubRegistry}:${githubTag} > /dev/null 2>&1; echo \$?"
+            echo "canPushDockerhubTag=${canPushDockerhubTag}"
 
-          docker.withRegistry( '', "${dockerhubCredentials}" ) {
-            dockerhubImage.push()
+            docker.withRegistry( '', "${dockerhubCredentials}" ) {
+              dockerhubImage.push()
 
-            if (canPushDockerhubTag) {
-              dockerhubImage.push("${githubTag}")
+              if (canPushDockerhubTag) {
+                dockerhubImage.push("${githubTag}")
+              }
             }
-          }
 
-          // Github
-          // Check if Github tag exists
-          canPushGithubTag = sh "docker manifest inspect ${githubRegistry}:${githubTag} > /dev/null 2>&1; echo \$?",
-          echo "canPushGithubTag=${canPushGithubTag}"
+            // Github
+            // Check if Github tag exists
+            canPushGithubTag = sh "docker manifest inspect ${githubRegistry}:${githubTag} > /dev/null 2>&1; echo \$?",
+            echo "canPushGithubTag=${canPushGithubTag}"
 
-          docker.withRegistry("https://${githubRegistry}", "${githubCredentials}" ) {
-            githubImage.push()
-            
-            if (canPushGithubTag) {
-              githubImage.push("${githubTag}")
+            docker.withRegistry("https://${githubRegistry}", "${githubCredentials}" ) {
+              githubImage.push()
+              
+              if (canPushGithubTag) {
+                githubImage.push("${githubTag}")
+              }
             }
-          }
+          } catch(e) {echo e}
         }
       }
     }
