@@ -54,24 +54,22 @@ pipeline {
 
           // Docker Hub
           // Check if DockerHub tag exists. We don' want to overwrite version tags
-          canPushDockerhubTag = sh(
-            script: "! docker manifest inspect ${dockerhubRegistry}:${githubTag} > /dev/null 2>&1; echo \$?;"
-          ) == 0
-          echo "canPushDockerhubTag: ${canPushDockerhubTag}"
+          sh "! docker manifest inspect ${dockerhubRegistry}:${githubTag} > /dev/null 2>&1; echo \$? > cmdOut"
+          dockerhubRegistry = readFile('cmdOut').trim() == (0 || '0') ?  true : false
+          echo "dockerhubRegistry: ${dockerhubRegistry}"
 
           docker.withRegistry( '', "${dockerhubCredentials}" ) {
             dockerhubImage.push()
 
-            if (canPushDockerhubTag) {
+            if (dockerhubRegistry) {
               dockerhubImage.push("${githubTag}")
             }
           }
 
           // Github
           // Check if Github tag exists. We don' want to overwrite version tags
-          canPushGithubTag = sh(
-            script: "! docker manifest inspect ${githubRegistry}:${githubTag} > /dev/null 2>&1; echo \$?"
-            ) == 0
+          sh "! docker manifest inspect ${githubRegistry}:${githubTag} > /dev/null 2>&1; echo \$? > cmdOut"
+          canPushGithubTag = readFile('cmdOut').trim() == (0 || '0') ?  true : false
           echo "canPushGithubTag: ${canPushGithubTag}"
 
           docker.withRegistry("https://${githubRegistry}", "${githubCredentials}" ) {
