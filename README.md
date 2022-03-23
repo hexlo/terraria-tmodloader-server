@@ -78,6 +78,9 @@ services:
       - type: bind
         source: ./Worlds
         target: /root/.local/share/Terraria/ModLoader/Worlds/
+      - type: bind
+        source: ./enabled.json
+        target: /root/.local/share/Terraria/ModLoader/Mods/enabled.json
     environment:
       - world=/root/.local/share/Terraria/ModLoader/Worlds/Calamity0.wld
       - autocreate=2
@@ -144,10 +147,20 @@ If you want the server to start automatically on subsequent runs, you need to pr
 ## <ins> **Mods** </ins>
 
 Mods included in this image:
-- [BossChecklist](https://github.com/JavidPack/BossChecklist/releases/latest)
-- [RecipeBrowser](https://github.com/JavidPack/RecipeBrowser/releases/latest)
-- [MagicStorageExtra](https://github.com/ExterminatorX99/MagicStorageExtra/releases/latest)
-- [ThoriumMod](https://github.com/SamsonAllen13/ThoriumMod/releases/latest) (disabled by default)
+- [BossChecklist](https://github.com/JavidPack/BossChecklist)
+- [CalamityMod](https://github.com/MountainDrew8/CalamityMod)
+- [CalamityMusicMod](https://github.com/CalamityTeam/CalamityModMusicPublic)
+- [DBZMOD](https://github.com/dbtr/DBZMOD)
+- [ExtensibleInventory](https://github.com/hamstar0/tml-extensibleinventory-mod)
+- [Fargowiltas](https://github.com/Fargowilta/Fargowiltas)
+- [FargowiltasSouls](https://github.com/Fargowilta/FargowiltasSouls)
+- [FargowiltasSoulsDLC](https://github.com/Fargowilta/FargowiltasSoulsDLC)
+- [MagicStorageExtra](https://github.com/ExterminatorX99/MagicStorageExtra)
+- [RecipeBrowser](https://github.com/JavidPack/RecipeBrowser)
+- [TerrariaOverhaul](https://github.com/Mirsario/TerrariaOverhaul)
+- [ThoriumMod](https://github.com/SamsonAllen13/ThoriumMod)
+- [Tremor](https://github.com/IAmBatby/Tremor)
+- [WingSlot](https://github.com/abluescarab/tModLoader-WingSlot)
 <!-- end of the list -->
 
 *Note: If you would like mods that are not here, please let me know and I'll try my best to add them.*  

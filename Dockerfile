@@ -6,6 +6,8 @@ ENV TMODLOADER_VERSION=""
 
 ENV VERSION_FILE=/terraria-server/versions.txt
 
+ENV MODS_DIR=/root/.local/share/Terraria/ModLoader/Mods
+
 ENV PATH="/scripts:${PATH}"
 
 ### Image variables
@@ -42,88 +44,102 @@ ENV priority=1
 
 ### Logic
 
-RUN apt update && apt install -y curl unzip
-
-ARG CACHE_DATE=''
+RUN mkdir -p /root/.local/share/Terraria/ModLoader/Worlds \
+    /root/.local/share/Terraria/ModLoader/Players \
+    /root/.local/share/Terraria/ModLoader/Mods \
+    /scripts \
+    /terraria-server \
+    && touch ${VERSION_FILE}
 
 COPY ./.scripts/* /scripts/
 
 RUN chmod +x /scripts/*
 
-RUN mv /scripts/init.sh /terraria-server
-
-RUN mkdir -p /root/.local/share/Terraria/ModLoader/Worlds \
-    /root/.local/share/Terraria/ModLoader/Players \
-    /root/.local/share/Terraria/ModLoader/Mods
+RUN mv /scripts/init-tModLoaderServer.sh /terraria-server
 
 WORKDIR /terraria-server
 
+RUN apt update && apt install -y curl unzip
+
 # Get Terraria Server Version
 RUN export TERRARIA_VERSION=$(/scripts/get-terraria-version.sh | sed 's/[0-9]/&./g' | sed 's#.$##') \
-    echo "TERRARIA_VERSION=${TERRARIA_VERSION}" \
-    echo "terrariaServer=${TERRARIA_VERSION}" > $VERSION_FILE
+    echo "terrariaServer=${TERRARIA_VERSION}" | tee -a ${VERSION_FILE}
 
-# Get latest tModLoader
+# tModLoader
 RUN export TMODLOADER_VERSION=$(/scripts/get-mod-version.sh https://github.com/tModLoader/tModLoader/releases/latest) \
-    && echo "TMODLOADER_VERSION=${TMODLOADER_VERSION}" \
-    && echo "tModLoader=${TMODLOADER_VERSION}" >> $VERSION_FILE \
+    && echo "tModLoader: ${TMODLOADER_VERSION}" | tee -a ${VERSION_FILE} \
     && curl -L https://github.com/tModLoader/tModLoader/releases/download/v${TMODLOADER_VERSION}/tModLoader.Linux.v${TMODLOADER_VERSION}.zip --output tmodloader-server.zip \  
     && unzip -o tmodloader-server.zip -d /terraria-server/ \
     && rm tmodloader-server.zip \
     && chmod +x /terraria-server/tModLoaderServer*
 
-# Get latest Calamity Mod 
-RUN export CALAMITY_VERSION=$(/scripts/get-mod-version.sh https://github.com/MountainDrew8/CalamityMod/releases/latest) \
-    && echo "CALAMITY_VERSION=${CALAMITY_VERSION}" \
-    && echo "CalamityMod=${CALAMITY_VERSION}" >> $VERSION_FILE \
-    && cd /root/.local/share/Terraria/ModLoader/Mods \
-    && curl -L https://github.com/MountainDrew8/CalamityMod/releases/download/v${CALAMITY_VERSION}/CalamityMod.tmod --output CalamityMod.tmod \
-    && cd /terraria-server
+# BossChecklist Mod
+RUN output=$(/scripts/get-mod.sh https://github.com/JavidPack/BossChecklist ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}
 
-# Get latest Calamity Music Mod
-RUN export CALAMITY_MUSIC_VERSION=$(/scripts/get-mod-version.sh https://github.com/CalamityTeam/CalamityModMusicPublic/releases/latest) \
-    && echo "CALAMITY_MUSIC_VERSION=${CALAMITY_MUSIC_VERSION}" \
-    && echo "CalamityModMusic=${CALAMITY_MUSIC_VERSION}" >> $VERSION_FILE \
-    && cd /root/.local/share/Terraria/ModLoader/Mods \
-    && curl -L https://github.com/CalamityTeam/CalamityModMusicPublic/releases/download/v${CALAMITY_MUSIC_VERSION}/CalamityModMusic.tmod --output CalamityModMusic.tmod \
-    && cd /terraria-server
+# CalamityMod 
+RUN output=$(/scripts/get-mod.sh https://github.com/MountainDrew8/CalamityMod ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}
 
-# Get latest BossChecklist Mod
-RUN export BOSSCHECKLIST_VERSION=$(/scripts/get-mod-version.sh https://github.com/JavidPack/BossChecklist/releases/latest) \
-    && echo "BOSSCHECKLIST_VERSION=${BOSSCHECKLIST_VERSION}" \
-    && echo "BossChecklist=${BOSSCHECKLIST_VERSION}" >> $VERSION_FILE \
-    && cd /root/.local/share/Terraria/ModLoader/Mods \
-    && curl -L https://github.com/JavidPack/BossChecklist/releases/download/v${BOSSCHECKLIST_VERSION}/BossChecklist.tmod --output BossChecklist.tmod \
-    && cd /terraria-server
+# CalamityMusicMod
+RUN output=$(/scripts/get-mod.sh https://github.com/CalamityTeam/CalamityModMusicPublic ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}
 
-# Get latest RecipeBrowser Mod
-RUN export RECIPEBROWSER_VERSION=$(/scripts/get-mod-version.sh https://github.com/JavidPack/RecipeBrowser/releases/latest) \
-    && echo "RECIPEBROWSER_VERSION=${RECIPEBROWSER_VERSION}" \
-    && echo "RecipeBrowser=${RECIPEBROWSER_VERSION}" >> $VERSION_FILE \
-    && cd /root/.local/share/Terraria/ModLoader/Mods \
-    && curl -L https://github.com/JavidPack/RecipeBrowser/releases/download/v${RECIPEBROWSER_VERSION}/RecipeBrowser.tmod --output RecipeBrowser.tmod \
-    && cd /terraria-server
+# DBZMOD
+RUN output=$(/scripts/get-mod.sh https://github.com/dbtr/DBZMOD ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}
 
-# Get latest MagicStorageExtra Mod
-RUN export MAGICSTORAGEEXTRA_VERSION=$(/scripts/get-mod-version.sh https://github.com/ExterminatorX99/MagicStorageExtra/releases/latest) \
-    && echo "MAGICSTORAGEEXTRA_VERSION=${MAGICSTORAGEEXTRA_VERSION}" \
-    && echo "MagicStorageExtra=${MAGICSTORAGEEXTRA_VERSION}" >> $VERSION_FILE \
-    && cd /root/.local/share/Terraria/ModLoader/Mods \
-    && curl -L https://github.com/ExterminatorX99/MagicStorageExtra/releases/download/v${MAGICSTORAGEEXTRA_VERSION}/MagicStorageExtra.tmod --output MagicStorageExtra.tmod \
-    && cd /terraria-server
+# ExtensibleInventory
+RUN output=$(/scripts/get-mod.sh https://github.com/hamstar0/tml-extensibleinventory-mod ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}
 
-# Get latest ThoriumMod
-RUN export THORIUM_VERSION=$(/scripts/get-mod-version.sh https://github.com/SamsonAllen13/ThoriumMod/releases/latest) \
-    && echo "THORIUM_VERSION=${THORIUM_VERSION}" \
-    && echo "ThoriumMod=${THORIUM_VERSION}" >> $VERSION_FILE \
-    && cd /root/.local/share/Terraria/ModLoader/Mods \
-    && curl -L https://github.com/SamsonAllen13/ThoriumMod/releases/download/v${THORIUM_VERSION}/ThoriumMod.tmod --output ThoriumMod.tmod \
-    && cd /terraria-server
+# Fargowiltas
+RUN output=$(/scripts/get-mod.sh https://github.com/Fargowilta/Fargowiltas ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}
 
-COPY ./enabled.json /root/.local/share/Terraria/ModLoader/Mods
+# FargowiltasSouls
+RUN output=$(/scripts/get-mod.sh https://github.com/Fargowilta/FargowiltasSouls ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}
+
+# FargowiltasSoulsDLC
+RUN output=$(/scripts/get-mod.sh https://github.com/Fargowilta/FargowiltasSoulsDLC ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}
+
+# MagicStorageExtra
+RUN output=$(/scripts/get-mod.sh https://github.com/ExterminatorX99/MagicStorageExtra ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}
+
+# RecipeBrowser Mod
+RUN output=$(/scripts/get-mod.sh https://github.com/JavidPack/RecipeBrowser ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}
+
+# TerrariaOverhaul
+RUN output=$(/scripts/get-mod.sh https://github.com/Mirsario/TerrariaOverhaul ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}
+
+# ThoriumMod
+RUN output=$(/scripts/get-mod.sh https://github.com/SamsonAllen13/ThoriumMod ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}
+
+# Tremor
+RUN output=$(/scripts/get-mod.sh https://github.com/IAmBatby/Tremor ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}
+
+# WingSlot
+RUN output=$(/scripts/get-mod.sh https://github.com/abluescarab/tModLoader-WingSlot ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}
+
+RUN cd /root/.local/share/Terraria/ModLoader/Mods \
+    && touch enabled.json \
+    && echo '[' >> enabled.json \
+    && echo '   "BossChecklist",' >> enabled.json \
+    && echo '   "MagicStorageExtra",' >> enabled.json \
+    && echo '   "RecipeBrowser",' >> enabled.json \
+    && echo '   "ThoriumMod"' >> enabled.json \
+    && echo ']' >> enabled.json
 
 VOLUME ["/root/.local/share/Terraria/ModLoader/Worlds"]
 
 WORKDIR /terraria-server
 
-ENTRYPOINT [ "./init.sh" ]
+ENTRYPOINT [ "./init-tModLoaderServer.sh" ]

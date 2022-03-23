@@ -5,3 +5,6 @@ docker-compose.yml
 
 Worlds/*
 !Worlds/.gitkeep
+
+.scripts/test.sh
+**.tmod
