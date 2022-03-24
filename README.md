@@ -45,7 +45,6 @@ ghcr.io/hexlo/terraria-tmodloader-server:latest
 ***Client-side:***
 - Terraria
 - tModLoader
-- The matching Mods you want to use that are enabled on the server. Install them via tModLoader's Mods browser.
 
 <br>
 
@@ -165,36 +164,36 @@ Mods included in this image:
 
 *Note: If you would like mods that are not here, please let me know and I'll try my best to add them.*  
 
-To use these mods, you also need to install them via tModLoader's Mods Browser on your client.
-To enable or disable mods on the server, modify the `enabled.json` file with the names of the mods. This needs to be done before starting the container.  
+To enable or disable mods on the server, modify the `enabled.json` file with the names of the mods (the exact names as above). This needs to be done before starting the container.  
 Some mods may clash with each others, especially big content mods. Refer to the mod's wiki for more info.
 
 <ins>`enabled.json` example: </ins>
 ```
 [
+  "BossChecklist",
+  "MagicStorageExtra",
   "ThoriumMod",
   "MagicStorageExtra"
 ]
 ```
-*Notes:*
-- The mod's names are in double quotes
+*Notes; The array of mod's names need the following properties:*
+- The mod's names are exactly as they appear in the list above
+- The mod's names are in double quote
 - They are separated with a comma
-- There needs to be no trailing comma after the last item in the array  
+- There needs to be no trailing comma after the last item in the array 
 <br>
 
 ### <ins> **Important!**  
 
 <ins> On the Client (your computer): </ins>
 
->You need tModLoader to play on this version of the server. Download it through steam and keep it up to date. Launch tModLoader and download the same mods that are active on the server.  
->Make sure you enable them and or reload them via the *Mod's* menu on your tModLoader client.  
+>You need tModLoader to play on this version of the server. Download it through steam and keep it up to date.  
 
   
 
 <ins> On the server: </ins>   
 >If the server gets out of date, make sure you recreate the container to update it.  
->Worlds and players created with 1.4 or newer will not work with tModLoader. (as of today).  
->Refer to the `enabled.json` file to know which mods are active or not, and match them on your client. 
+>Worlds and players created with 1.4 or newer will not work with this version of tModLoader.   
 
 <br>
 
