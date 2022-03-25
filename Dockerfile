@@ -133,6 +133,10 @@ RUN output=$(/scripts/get-mod.sh https://github.com/IAmBatby/Tremor ${MODS_DIR})
 RUN output=$(/scripts/get-mod.sh https://github.com/abluescarab/tModLoader-WingSlot ${MODS_DIR}) \
     && echo ${output} | tee -a ${VERSION_FILE}
 
+# WMITF
+RUN output=$(/scripts/get-mod.sh https://github.com/gardenappl/WMITF ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}
+
 RUN cd /root/.local/share/Terraria/ModLoader/Mods \
     && touch enabled.json \
     && echo '[' >> enabled.json \

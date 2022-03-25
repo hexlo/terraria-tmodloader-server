@@ -15,3 +15,4 @@ echo "TerrariaOverhaul: $(./get-mod-version.sh https://github.com/Mirsario/Terra
 echo "ThoriumMod: $(./get-mod-version.sh https://github.com/SamsonAllen13/ThoriumMod)"
 echo "Tremor: $(./get-mod-version.sh https://github.com/IAmBatby/Tremor)"
 echo "WingSlot: $(./get-mod-version.sh https://github.com/abluescarab/tModLoader-WingSlot)"
+echo "WMITF: $(./get-mod-version.sh https://github.com/gardenappl/WMITF)"

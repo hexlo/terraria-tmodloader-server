@@ -176,6 +176,7 @@ Mods included in this image:
 - [ThoriumMod](https://github.com/SamsonAllen13/ThoriumMod)
 - [Tremor](https://github.com/IAmBatby/Tremor)
 - [WingSlot](https://github.com/abluescarab/tModLoader-WingSlot)
+- [WMITF](https://github.com/gardenappl/WMITF)
 <!-- end of the list -->
 
 _Note: If you would like mods that are not here, please let me know and I'll try my best to add them._
