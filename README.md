@@ -191,8 +191,8 @@ Some mods may clash with each others, especially big content mods. Refer to the 
 [
   "BossChecklist",
   "MagicStorageExtra",
-  "ThoriumMod",
-  "MagicStorageExtra"
+  "RecipeBrowser",
+  "ThoriumMod"
 ]
 ```
 
