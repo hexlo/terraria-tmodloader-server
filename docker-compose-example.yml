@@ -1,0 +1,24 @@
+version: '3.2'
+services:
+  terraria-tmodloader-server:
+    image: hexlo/terraria-tmodloader-server:latest
+    container_name: terraria-tmodloader-server
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    ports:
+      - 7784:7777
+    volumes:
+      - type: bind
+        source: ./Worlds
+        target: /root/.local/share/Terraria/ModLoader/Worlds/
+      - type: bind
+        source: ./enabled.json
+        target: /root/.local/share/Terraria/ModLoader/Mods/enabled.json
+    environment:
+      - world=/root/.local/share/Terraria/ModLoader/Worlds/ModdedWorld1.wld
+      - autocreate=2
+      - worldname=ModdedWorld1
+      - difficulty=1
+      - password=passworld
+      - motd="Welcome to hexlo's server! :)"

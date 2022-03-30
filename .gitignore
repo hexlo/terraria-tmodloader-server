@@ -1,6 +1,7 @@
 terraria-server.zip
 terraria-server/
 docker-compose.yml
+!docker-compose-example.yml
 !Dockerfile
 
 Worlds/*

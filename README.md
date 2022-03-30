@@ -59,7 +59,8 @@ ghcr.io/hexlo/terraria-tmodloader-server:latest
 ## <ins> **General Config** </ins>
 
 - Clone this repository
-- Create a `docker-compose.yml` file (see example below).
+- Create a `docker-compose.yml` file (see example below).  
+You can otherwise rename `docker-compose-example.yml` to `docker-compose.yml` and modify it.
 - Edit the environment variables as you see fit. They are explained in a table further down.
 - Edit the enabled.json to include the mods you want. Check below for available mods.
 
