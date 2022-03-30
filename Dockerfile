@@ -73,6 +73,14 @@ RUN export TMODLOADER_VERSION=$(/scripts/get-mod-version.sh https://github.com/t
     && rm tmodloader-server.zip \
     && chmod +x /terraria-server/tModLoaderServer*
 
+# AlchemistNPC
+RUN output=$(/scripts/get-mod.sh https://github.com/VVV101/AlchemistNPC ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}
+
+# AlchemistNPClite
+RUN output=$(/scripts/get-mod.sh https://github.com/VVV101/AlchemistNPCLite ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}
+
 # BossChecklist Mod
 RUN output=$(/scripts/get-mod.sh https://github.com/JavidPack/BossChecklist ${MODS_DIR}) \
     && echo ${output} | tee -a ${VERSION_FILE}
@@ -83,10 +91,6 @@ RUN output=$(/scripts/get-mod.sh https://github.com/MountainDrew8/CalamityMod ${
 
 # CalamityMusicMod
 RUN output=$(/scripts/get-mod.sh https://github.com/CalamityTeam/CalamityModMusicPublic ${MODS_DIR}) \
-    && echo ${output} | tee -a ${VERSION_FILE}
-
-# DBZMOD
-RUN output=$(/scripts/get-mod.sh https://github.com/dbtr/DBZMOD ${MODS_DIR}) \
     && echo ${output} | tee -a ${VERSION_FILE}
 
 # ExtensibleInventory
@@ -127,6 +131,10 @@ RUN output=$(/scripts/get-mod.sh https://github.com/IAmBatby/Tremor ${MODS_DIR})
 
 # WingSlot
 RUN output=$(/scripts/get-mod.sh https://github.com/abluescarab/tModLoader-WingSlot ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}
+
+# WMITF
+RUN output=$(/scripts/get-mod.sh https://github.com/gardenappl/WMITF ${MODS_DIR}) \
     && echo ${output} | tee -a ${VERSION_FILE}
 
 RUN cd /root/.local/share/Terraria/ModLoader/Mods \
