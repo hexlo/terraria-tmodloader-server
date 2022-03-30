@@ -59,7 +59,7 @@ RUN mv /scripts/init-tModLoaderServer.sh /terraria-server
 
 WORKDIR /terraria-server
 
-RUN apt update && apt install -y curl unzip
+RUN dnf update -y && dnf install -y curl unzip findutils
 
 # Get Terraria Server Version
 RUN export TERRARIA_VERSION=$(/scripts/get-terraria-version.sh | sed 's/[0-9]/&./g' | sed 's#.$##') \

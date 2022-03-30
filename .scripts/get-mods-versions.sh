@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 echo "tModLoader: $(./get-mod-version.sh https://github.com/tModLoader/tModLoader/releases/latest)"
 echo "BossChecklist: $(./get-mod-version.sh https://github.com/JavidPack/BossChecklist/releases/latest)"
 echo "CalamityMod: $(./get-mod-version.sh https://github.com/MountainDrew8/CalamityMod/releases/latest)"
