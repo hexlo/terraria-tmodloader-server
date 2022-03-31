@@ -174,6 +174,7 @@ Mods included in this image:
 - [FargowiltasSoulsDLC](https://github.com/Fargowilta/FargowiltasSoulsDLC)
 - [MagicStorageExtra](https://github.com/ExterminatorX99/MagicStorageExtra)
 - [RecipeBrowser](https://github.com/JavidPack/RecipeBrowser)
+- [SpiritMod](https://github.com/PhoenixBladez/SpiritMod)
 - [TerrariaOverhaul](https://github.com/Mirsario/TerrariaOverhaul)
 - [ThoriumMod](https://github.com/SamsonAllen13/ThoriumMod)
 - [Tremor](https://github.com/IAmBatby/Tremor)
