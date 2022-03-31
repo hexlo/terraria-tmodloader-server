@@ -113,9 +113,14 @@ RUN output=$(/scripts/get-mod.sh https://github.com/Fargowilta/FargowiltasSoulsD
 RUN output=$(/scripts/get-mod.sh https://github.com/ExterminatorX99/MagicStorageExtra ${MODS_DIR}) \
     && echo ${output} | tee -a ${VERSION_FILE}
 
-# RecipeBrowser Mod
+# RecipeBrowser
 RUN output=$(/scripts/get-mod.sh https://github.com/JavidPack/RecipeBrowser ${MODS_DIR}) \
     && echo ${output} | tee -a ${VERSION_FILE}
+    
+# SpiritMod
+RUN output=$(/scripts/get-mod.sh https://github.com/PhoenixBladez/SpiritMod ${MODS_DIR}) \
+    && echo ${output} | tee -a ${VERSION_FILE}   
+    
 
 # TerrariaOverhaul
 RUN output=$(/scripts/get-mod.sh https://github.com/Mirsario/TerrariaOverhaul ${MODS_DIR}) \
