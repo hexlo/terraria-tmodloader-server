@@ -66,9 +66,8 @@ RUN export TERRARIA_VERSION=$(/scripts/get-terraria-version.sh | sed 's/[0-9]/&.
     echo "terrariaServer=${TERRARIA_VERSION}" | tee -a ${VERSION_FILE}
 
 # tModLoader
-RUN export TMODLOADER_VERSION=$(/scripts/get-mod-version.sh https://github.com/tModLoader/tModLoader/releases/latest) \
-    && echo "tModLoader: ${TMODLOADER_VERSION}" | tee -a ${VERSION_FILE} \
-    && curl -L https://github.com/tModLoader/tModLoader/releases/download/v${TMODLOADER_VERSION}/tModLoader.Linux.v${TMODLOADER_VERSION}.zip --output tmodloader-server.zip \  
+RUN output=$(/scripts/get-tmodloader-1_3.sh) \
+    && echo ${output} | tee -a ${VERSION_FILE} \
     && unzip -o tmodloader-server.zip -d /terraria-server/ \
     && rm tmodloader-server.zip \
     && chmod +x /terraria-server/tModLoaderServer*
