@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -eu
 # First Argument passed to this script needs to be the github repo URL
 # ie: https://github.com/<username>/<repo>
 #
@@ -19,8 +20,12 @@ latestVersion=$(get-mod-version.sh ${latestReleaseURL})
 #     | sed 's#\".*$##' \
 #     | tail -n 1)
 
-modName=$(curl -L ${latestReleaseURL} | grep '/.*\.tmod' | sed "s#^.*/##" | sed "s#\.tmod.*\$##")
-downloadURL=${1%/}/releases/download/v${latestVersion}/${modName}.tmod
-curl -L ${downloadURL} --output ${dest}/${modName}.tmod
 
-echo ${modName}: ${latestVersion}
+if [[ ! -z "$latestVersion" ]] ; then
+    modName=$(curl -L ${latestReleaseURL} | grep '/.*\.tmod' | sed "s#^.*/##" | sed "s#\.tmod.*\$##")
+    downloadURL=${1%/}/releases/download/v${latestVersion}/${modName}.tmod
+    curl -L ${downloadURL} --output ${dest}/${modName}.tmod
+    echo ${modName}: ${latestVersion}
+else
+    exit 1
+fi
