@@ -38,8 +38,8 @@ pipeline {
           tmodloaderVersion = sh(script: "${WORKSPACE}/.scripts/get-mod-version.sh https://github.com/tModLoader/tModLoader/releases/latest", , returnStdout: true).trim()
           echo "tmodloaderVersion=${tmodloaderVersion}"
 
-          // githubTag = '1.3-latest'
-          githubTag = sh(script: "git tag --sort version:refname | tail -1 | sed 's#v##'", returnStdout: true).trim()
+          githubTag = '1.3-latest'
+          // githubTag = sh(script: "git tag --sort version:refname | tail -1 | sed 's#v##'", returnStdout: true).trim()
           echo "githubTag=${githubTag}"
 
           // Docker Hub
@@ -55,8 +55,8 @@ pipeline {
 
           // Docker Hub
           // Check if DockerHub tag exists. We don' want to overwrite version tags
-          sh "! docker manifest inspect ${dockerhubRegistry}:${githubTag} > /dev/null 2>&1; echo \$? > cmdOut"
-          canPushDockerhubTag = readFile('cmdOut').trim() == 0 ?  true : false
+          sh(script: "! docker manifest inspect ${dockerhubRegistry}:${githubTag} > /dev/null 2>&1; echo \$? > cmdOut_docker", returnStdout: true).trim()
+          canPushDockerhubTag = readFile('cmdOut_docker').trim() == 0 ?  true : false
           echo "canPushDockerhubTag: ${canPushDockerhubTag}"
 
           docker.withRegistry( '', "${dockerhubCredentials}" ) {
@@ -69,8 +69,8 @@ pipeline {
 
           // Github
           // Check if Github tag exists. We don' want to overwrite version tags
-          sh "! docker manifest inspect ${githubRegistry}:${githubTag} > /dev/null 2>&1; echo \$? > cmdOut"
-          canPushGithubTag = readFile('cmdOut').trim() == 0 ?  true : false
+          sh("! docker manifest inspect ${githubRegistry}:${githubTag} > /dev/null 2>&1; echo \$? > cmdOut_github", returnStdout: true).trim()
+          canPushGithubTag = readFile('cmdOut_github').trim() == 0 ?  true : false
           echo "canPushGithubTag: ${canPushGithubTag}"
 
           docker.withRegistry("https://${githubRegistry}", "${githubCredentials}" ) {
