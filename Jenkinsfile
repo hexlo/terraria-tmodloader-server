@@ -32,7 +32,7 @@ pipeline {
       steps{
         script {
 
-          terrariaVersion = sh(script: "${WORKSPACE}/.scripts/get-terraria-version.sh", returnStdout: true).trim()
+          terrariaVersion = sh(script: "${WORKSPACE}/.scripts/get-terraria-version.sh", , returnStdout: true).trim()
           echo "terrariaVersion=${terrariaVersion}"
 
           tmodloaderVersion = sh(script: "${WORKSPACE}/.scripts/get-mod-version.sh https://github.com/tModLoader/tModLoader/releases/latest", , returnStdout: true).trim()
@@ -55,7 +55,7 @@ pipeline {
 
           // Docker Hub
           // Check if DockerHub tag exists. We don' want to overwrite version tags
-          sh(script: "! docker manifest inspect ${dockerhubRegistry}:${githubTag} > /dev/null 2>&1; echo \$? > cmdOut_docker", , returnStdout: true).trim()
+          sh "! docker manifest inspect ${dockerhubRegistry}:${githubTag} > /dev/null 2>&1; echo \$? > cmdOut_docker"
           def fout_docker = readFile('cmdOut_docker').trim()
           println(fout_docker)
           canPushDockerhubTag = readFile('cmdOut_docker').trim() == '0' ?  true : false
@@ -71,7 +71,7 @@ pipeline {
 
           // Github
           // Check if Github tag exists. We don' want to overwrite version tags
-          sh("! docker manifest inspect ${githubRegistry}:${githubTag} > /dev/null 2>&1; echo \$? > cmdOut_github", , returnStdout: true).trim()
+          sh"! docker manifest inspect ${githubRegistry}:${githubTag} > /dev/null 2>&1; echo \$? > cmdOut_github"
           def fout_github = readFile('cmdOut_github').trim()
           println(fout_github)
           canPushGithubTag = readFile('cmdOut_github').trim() == '0' ?  true : false
