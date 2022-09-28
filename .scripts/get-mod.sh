@@ -8,7 +8,6 @@ set -eu
 
 latestReleaseURL=$(echo ${1%/} | xargs)
 latestReleaseURL="${latestReleaseURL}/releases/latest"
-
 [[ -z ${2} ]] && dest=. || dest=${2%/}
 
 latestVersion=$(get-mod-version.sh ${latestReleaseURL})
@@ -20,6 +19,11 @@ latestVersion=$(get-mod-version.sh ${latestReleaseURL})
 #     | sed 's#\".*$##' \
 #     | tail -n 1)
 
+# modName=$(curl -L ${latestReleaseURL} | grep '/.*\.tmod' | sed "s#^.*/##" | sed "s#\.tmod.*\$##")
+modName=${3}
+downloadURL=${1%/}/releases/download/v${latestVersion}/${modName}.tmod
+# curl -LN ${downloadURL} --output ${dest}/${modName}.tmod
+curl -LN ${downloadURL} > ${dest}/${modName}.tmod;
 
 if [[ ! -z "$latestVersion" ]] ; then
     modName=$(curl -L ${latestReleaseURL} | grep '/.*\.tmod' | sed "s#^.*/##" | sed "s#\.tmod.*\$##")
