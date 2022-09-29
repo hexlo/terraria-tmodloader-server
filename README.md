@@ -69,7 +69,6 @@ You can otherwise rename `docker-compose-example.yml` to `docker-compose.yml` an
 ### **_docker-compose.yml example:_**
 
 ```
-version: '3.2'
 services:
   terraria-tmodloader-server1:
     # Github mirror: ghcr.io/hexlo/terraria-tmodloader-server:latest
@@ -93,7 +92,7 @@ services:
       - worldname=Calamity0
       - difficulty=1
       - password=calamity
-      - motd="Welcome to Hexlo's server! :)"
+      - motd="Welcome to hexlo's server! :)"
 ```
 
 - Launch the container. If you are using a command line interface (cli):  

@@ -11,12 +11,12 @@ services:
     volumes:
       - type: bind
         source: ./Worlds
-        target: /terraria-server/ModLoader/Worlds/
+        target: /root/.local/share/Terraria/ModLoader/Worlds/
       - type: bind
         source: ./enabled.json
-        target: /terraria-server/ModLoader/Mods/enabled.json
+        target: /root/.local/share/Terraria/ModLoader/Mods/enabled.json
     environment:
-      - world=/terraria-server/ModLoader/Worlds/ModdedWorld1.wld
+      - world=/root/.local/share/Terraria/ModLoader/Worlds/ModdedWorld1.wld
       - autocreate=2
       - worldname=ModdedWorld1
       - difficulty=1

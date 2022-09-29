@@ -1,5 +1,4 @@
-##### Builder Image
-FROM ubuntu:jammy as builder
+FROM ubuntu:jammy
 
 ARG VERSION=latest
 
@@ -17,35 +16,35 @@ ENV WORLDS_DIR=${BASE_PATH}/Worlds
 
 ENV PLAYERS_DIR=${BASE_PATH}/Players
 
-ENV VERSION_FILE=/terraria-server/versions.txt
+ENV VERSION_FILE=${BASE_PATH}/versions.txt
 
 ENV TMODLOADER_VERSION=""
 
-RUN mkdir -p ${MODS_DIR} ${WORLDS_DIR} ${PLAYERS_DIR} /scripts /terraria-server && \
+RUN mkdir -p ${MODS_DIR} ${WORLDS_DIR} ${PLAYERS_DIR} /scripts && \
     touch ${VERSION_FILE}
 
-WORKDIR /terraria-server
+WORKDIR ${BASE_PATH}
 
 COPY ./.scripts /scripts
 
 RUN chmod +x /scripts/*
 
-RUN mv /scripts/init-tModLoaderServer.sh /terraria-server
+RUN mv /scripts/init-tModLoaderServer.sh ${BASE_PATH}
 
 RUN apt update -y && apt install -y unzip curl findutils
 
 RUN if [ "${TERRARIA_VERSION}" = "latest" ]; then \
         echo "using latest version." \
-    &&  export LATEST_VERSION=$(/scripts/get-terraria-version.sh) \
+    &&  export LATEST_VERSION=$(get-terraria-version.sh) \
     &&  export TERRARIA_VERSION=${LATEST_VERSION}; fi \
     && echo "TERRARIA_VERSION=${TERRARIA_VERSION}" \
-    && echo "${TERRARIA_VERSION}" > /terraria-server/terraria-version.txt \
+    && echo "${TERRARIA_VERSION}" > ${BASE_PATH}/terraria-version.txt \
     && curl https://terraria.org/api/download/pc-dedicated-server/terraria-server-${TERRARIA_VERSION}.zip --output terraria-server.zip \  
-    && unzip terraria-server.zip -d /terraria-server && mv /terraria-server/*/* /terraria-server \
-    && rm -rf terraria-server.zip /terraria-server/Mac /terraria-server/Windows /terraria-server/${TERRARIA_VERSION} \
-    && mv /terraria-server/Linux/* /terraria-server/ \
-    && rm -rf /terraria-server/Linux \
-    && cd /terraria-server \
+    && unzip terraria-server.zip -d ${BASE_PATH} && mv ${BASE_PATH}/*/* ${BASE_PATH} \
+    && rm -rf terraria-server.zip ${BASE_PATH}/Mac ${BASE_PATH}/Windows ${BASE_PATH}/${TERRARIA_VERSION} \
+    && mv ${BASE_PATH}/Linux/* ${BASE_PATH}/ \
+    && rm -rf ${BASE_PATH}/Linux \
+    && cd ${BASE_PATH} \
     && chmod +x TerrariaServer.bin.x86_64*
 
 ### TModLoader Installation and Setup
@@ -58,17 +57,17 @@ RUN export TERRARIA_VERSION=$(get-terraria-version.sh | sed 's/[0-9]/&./g' | sed
 # # tModLoader
 # RUN output=$(/scripts/get-tmodloader-1_3.sh) \
 #     && echo ${output} | tee -a ${VERSION_FILE} \
-#     && unzip -o tmodloader-server.zip -d /terraria-server/ \
+#     && unzip -o tmodloader-server.zip -d ${BASE_PATH}/ \
 #     && rm tmodloader-server.zip \
-#     && chmod +x /terraria-server/tModLoaderServer*
+#     && chmod +x ${BASE_PATH}/tModLoaderServer*
 
 ## Fixed tModLoader Version: v0.11.8.9 (last 1.3 version)
 RUN curl -L --silent https://github.com/tModLoader/tModLoader/releases/download/v0.11.8.9/tModLoader.Linux.v0.11.8.9.zip \
     --output tmodloader-server.zip \
     && echo "tModLoader: v0.11.8.9" | tee -a ${VERSION_FILE} \
-    && unzip -o tmodloader-server.zip -d /terraria-server/ \
+    && unzip -o tmodloader-server.zip -d ${BASE_PATH}/ \
     && rm tmodloader-server.zip \
-    && chmod +x /terraria-server/tModLoaderServer*
+    && chmod +x ${BASE_PATH}/tModLoaderServer*
 
 # AlchemistNPC
 RUN mkdir -pv ${MODS_DIR} && ls -alh ${MODS_DIR}
@@ -148,23 +147,6 @@ RUN touch ${MODS_DIR}/enabled.json \
     && echo '   "ThoriumMod"' >> enabled.json \
     && echo ']' >> enabled.json
 
-###########################################################    
-## Final Image
-
-# FROM alpine:latest
-
-# ENV BASE_PATH=/terraria-server/ModLoader
-
-# ENV MODS_DIR=${BASE_PATH}/Mods
-
-# ENV WORLDS_DIR=${BASE_PATH}/Worlds
-
-# ENV PLAYERS_DIR=${BASE_PATH}/Players
-
-# ENV TMODLOADER_VERSION=""
-
-# ENV PATH="/scripts:${PATH}"
-
 ### Image variables
 
 ENV autocreate=2
@@ -199,9 +181,7 @@ ENV priority=1
 
 # Logic
 
-WORKDIR /terraria-server
-
-# COPY --from=builder /terraria-server/* ./
+WORKDIR ${BASE_PATH}
 
 VOLUME ["/root/.local/share/Terraria/ModLoader/Worlds"]
 
