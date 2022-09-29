@@ -9,7 +9,7 @@ ENV LATEST_VERSION=""
 
 ENV PATH="/scripts:${PATH}"
 
-ENV BASE_PATH=/terraria-server/ModLoader
+ENV BASE_PATH=/root/.local/share/Terraria/ModLoader
 
 ENV MODS_DIR=${BASE_PATH}/Mods
 
@@ -21,7 +21,7 @@ ENV VERSION_FILE=/terraria-server/versions.txt
 
 ENV TMODLOADER_VERSION=""
 
-RUN mkdir -p ${MODS_DIR} ${WORLDS_DIR} ${PLAYERS_DIR} /scripts && \
+RUN mkdir -p ${MODS_DIR} ${WORLDS_DIR} ${PLAYERS_DIR} /scripts /terraria-server && \
     touch ${VERSION_FILE}
 
 WORKDIR /terraria-server
@@ -151,19 +151,19 @@ RUN touch ${MODS_DIR}/enabled.json \
 ###########################################################    
 ## Final Image
 
-FROM alpine:latest
+# FROM alpine:latest
 
-ENV BASE_PATH=/terraria-server/ModLoader
+# ENV BASE_PATH=/terraria-server/ModLoader
 
-ENV MODS_DIR=${BASE_PATH}/Mods
+# ENV MODS_DIR=${BASE_PATH}/Mods
 
-ENV WORLDS_DIR=${BASE_PATH}/Worlds
+# ENV WORLDS_DIR=${BASE_PATH}/Worlds
 
-ENV PLAYERS_DIR=${BASE_PATH}/Players
+# ENV PLAYERS_DIR=${BASE_PATH}/Players
 
-ENV TMODLOADER_VERSION=""
+# ENV TMODLOADER_VERSION=""
 
-ENV PATH="/scripts:${PATH}"
+# ENV PATH="/scripts:${PATH}"
 
 ### Image variables
 
@@ -201,8 +201,8 @@ ENV priority=1
 
 WORKDIR /terraria-server
 
-COPY --from=builder /terraria-server/* ./
+# COPY --from=builder /terraria-server/* ./
 
-VOLUME ["/terraria-server/ModLoader/Worlds"]
+VOLUME ["/root/.local/share/Terraria/ModLoader/Worlds"]
 
 ENTRYPOINT [ "./init-tModLoaderServer.sh" ]
