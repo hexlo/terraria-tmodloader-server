@@ -24,14 +24,6 @@
 hexlo/terraria-tmodloader-server:latest
 ```
 
-<p style="color:#0078d7; font-family: Consolas">
-  <ins> Github image: </ins>
-</p>
-
-```
-ghcr.io/hexlo/terraria-tmodloader-server:latest
-```
-
 <br>
 
 ---
@@ -71,7 +63,6 @@ You can otherwise rename `docker-compose-example.yml` to `docker-compose.yml` an
 ```
 services:
   terraria-tmodloader-server1:
-    # Github mirror: ghcr.io/hexlo/terraria-tmodloader-server:latest
     image: hexlo/terraria-tmodloader-server:latest
     container_name: terraria-tmodloader-server1
     restart: unless-stopped
