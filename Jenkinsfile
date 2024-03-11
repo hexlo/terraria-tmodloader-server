@@ -88,11 +88,11 @@ pipeline {
       }
     }
   }
-  post {
-    failure {
-        mail bcc: '', body: "<b>Jenkins Build Report</b><br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} \
-         <br>Branch: ${env.BRANCH_NAME}", cc: '', charset: 'UTF-8', from: '', mimeType: 'text/html', replyTo: '', \
-        subject: "Jenkins Build Failed: ${env.JOB_NAME}", to: "jenkins@runx.io";
-    }
-  }
+  // post {
+  //   failure {
+  //       mail bcc: '', body: "<b>Jenkins Build Report</b><br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} \
+  //        <br>Branch: ${env.BRANCH_NAME}", cc: '', charset: 'UTF-8', from: '', mimeType: 'text/html', replyTo: '', \
+  //       subject: "Jenkins Build Failed: ${env.JOB_NAME}", to: "jenkins@runx.io";
+  //   }
+  // }
 }
