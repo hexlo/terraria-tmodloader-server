@@ -4,7 +4,7 @@ pipeline {
     imageName = "terraria-tmodloader-server"
     imageTag = 'latest'
     githubTag = ''
-    gitBranch = 'main'
+    gitBranch = '1.4.4'
     gitRepo = "https://github.com/${userName}/${imageName}.git"
     dockerhubRegistry = "${userName}/${imageName}"
     githubRegistry = "ghcr.io/${userName}/${imageName}"
@@ -34,13 +34,6 @@ pipeline {
 
           terrariaVersion = sh(script: "${WORKSPACE}/.scripts/get-terraria-version.sh", , returnStdout: true).trim()
           echo "terrariaVersion=${terrariaVersion}"
-
-          tmodloaderVersion = sh(script: "${WORKSPACE}/.scripts/get-mod-version.sh https://github.com/tModLoader/tModLoader/releases/latest", , returnStdout: true).trim()
-          echo "tmodloaderVersion=${tmodloaderVersion}"
-
-          // githubTag = '1.3-latest'
-          githubTag = sh(script: "git tag --sort version:refname | tail -1 | sed 's#v##'", returnStdout: true).trim()
-          echo "githubTag=${githubTag}"
 
           // Docker Hub
           dockerhubImage = docker.build( "${dockerhubRegistry}:${imageTag}", "--no-cache ." )
@@ -90,7 +83,7 @@ pipeline {
     stage('Remove Unused docker image') {
       steps{
         catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-          sh "docker system prune -f"
+          sh "docker system prune --force --volumes"
         }
       }
     }
@@ -99,7 +92,7 @@ pipeline {
     failure {
         mail bcc: '', body: "<b>Jenkins Build Report</b><br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} \
          <br>Branch: ${env.BRANCH_NAME}", cc: '', charset: 'UTF-8', from: '', mimeType: 'text/html', replyTo: '', \
-        subject: "Jenkins Build Failed: ${env.JOB_NAME}", to: "jenkins@mindlab.dev";
+        subject: "Jenkins Build Failed: ${env.JOB_NAME}", to: "jenkins@runx.io";
     }
   }
 }

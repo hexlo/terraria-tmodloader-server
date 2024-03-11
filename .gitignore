@@ -1,13 +1,11 @@
-terraria-server.zip
-terraria-server/
-docker-compose.yml
-!docker-compose-example.yml
-!Dockerfile
+tModLoader/Worlds/**
+!tModLoader/Worlds/.gitkeep
 
-Worlds/*
-!Worlds/.gitkeep
+tModLoader/Mods/*
+!tModLoader/Mods/.gitkeep
+!tModLoader/Mods/enabled.json
+!tModLoader/Mods/install.txt
 
-.scripts/test.sh
-**.tmod
+tModLoader/logs/**
 
-build.txt
+server
