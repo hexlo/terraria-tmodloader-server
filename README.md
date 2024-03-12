@@ -10,9 +10,18 @@
 
 <br>
 
+**Also available: [Vanilla Terraria Server for amd64 and arm64](https://github.com/hexlo/terraria-server-docker) ===> Dockerhub image:** `hexlo/terraria-server-docker:latest`
+
+<br>
+
+---
+
+<br>
+
+
 # **Terraria & tModLoader server**
 
-### This is a tModLoader server for Terraria PC, packaged as a docker image.
+### This is a tModLoader server for Terraria, packaged as a docker image.
 
 <br>
 
