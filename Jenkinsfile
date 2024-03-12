@@ -4,7 +4,7 @@ pipeline {
     imageName = "terraria-tmodloader-server"
     imageTag = 'latest'
     githubTag = ''
-    gitBranch = '1.4.4'
+    gitBranch = 'main'
     gitRepo = "https://github.com/${userName}/${imageName}.git"
     dockerhubRegistry = "${userName}/${imageName}"
     githubRegistry = "ghcr.io/${userName}/${imageName}"
