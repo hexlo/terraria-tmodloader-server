@@ -31,7 +31,7 @@ pipeline {
     stage('Building image') {
       steps{
         script {
-          terrariaVersion = sh(script: "${WORKSPACE}/.scripts/get-terraria-version.sh", , returnStdout: true).trim()
+          terrariaVersion = sh(script: "${WORKSPACE}/tModLoader/Scripts/get-terraria-version.sh", , returnStdout: true).trim()
           echo "terrariaVersion=${terrariaVersion}"
           // Docker Hub
           dockerhubImage = docker.build( "${dockerhubRegistry}:${imageTag}", "--no-cache ." )
