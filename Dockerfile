@@ -1,11 +1,8 @@
 FROM steamcmd/steamcmd:alpine-3
 
-ENV UID=1000
-ENV GID=1000
-
 # Install prerequisites
 RUN apk update \
- && apk add --no-cache bash curl tmux libstdc++ libgcc icu-libs \
+ && apk add --no-cache bash curl tmux libstdc++ libgcc icu-libs bash tmux \
  && rm -rf /var/cache/apk/*
 
 # Fix 32 and 64 bit library conflicts
@@ -18,8 +15,8 @@ ENV LD_LIBRARY_PATH /steamlib
 ARG TML_VERSION
 
 # Create tModLoader user and drop root permissions
-ARG UID
-ARG GID
+ARG UID=1000
+ARG GID=1000
 RUN addgroup -g $GID tml \
  && adduser tml -u $UID -G tml -h /home/tml -D
 
@@ -27,6 +24,31 @@ USER tml
 ENV USER tml
 ENV HOME /home/tml
 WORKDIR $HOME
+
+# Adding Scripts to PATH
+ENV SCRIPTS_PATH="/home/tml/.local/share/Terraria/tModLoader/Scripts"
+ENV PATH="${SCRIPTS_PATH}:${PATH}"
+
+# Using Environment variables for server config by default. If you would like to use a serverconfig.txt file instead, uncomment the following variable or use it in your docker-compose.yml environment section.
+# ENV USE_CONFIG_FILE=1
+
+# Environment variables for server settings
+ENV WORLD=""
+ENV AUTOCREATE="1"
+ENV SEAD=""
+ENV WORLDNAME="tmlWorld.wld"
+ENV DIFFICULTY="1"
+ENV MAXPLAYERS="16"
+ENV PORT="7777"
+ENV PASSWORD=""
+ENV MOTD=""
+ENV WORLDPATH="/home/tml/.local/share/Terraria/tModLoader/Worlds/"
+ENV BANLIST="banlist.txt"
+ENV SECURE="1"
+ENV LANGUAGE="en/US"
+ENV UPNP="1"
+ENV NPCSTREAM="1"
+ENV PRIORITY=""
 
 # Update SteamCMD and verify latest version
 RUN steamcmd +quit
@@ -41,4 +63,4 @@ RUN ./manage-tModLoaderServer.sh install-tml --github --tml-version $TML_VERSION
 
 EXPOSE 7777
 
-ENTRYPOINT [ "./manage-tModLoaderServer.sh", "docker", "--folder", "/home/tml/.local/share/Terraria/tModLoader" ]
+ENTRYPOINT [ "entrypoint.sh" ]
