@@ -1,24 +1,24 @@
-version: '3.2'
 services:
-  terraria-tmodloader-server:
-    image: hexlo/terraria-tmodloader-server:latest
-    container_name: terraria-tmodloader-server
-    restart: unless-stopped
-    stdin_open: true
+  tml:
+    container_name: tml
+    #restart: unless-stopped
+    build:
+      context: .
+      args:
+        UID: 1000
+        GID: 1000
+        #TML_VERSION: v2023.8.3.3
+    #entrypoint: [ "/bin/bash" ] # Uncomment this line if you need to poke around in the container
     tty: true
+    stdin_open: true
     ports:
-      - 7784:7777
+      - 7785:7777
     volumes:
-      - type: bind
-        source: ./Worlds
-        target: /root/.local/share/Terraria/ModLoader/Worlds/
-      - type: bind
-        source: ./enabled.json
-        target: /root/.local/share/Terraria/ModLoader/Mods/enabled.json
+      - ./tModLoader:/home/tml/.local/share/Terraria/tModLoader
     environment:
-      - world=/root/.local/share/Terraria/ModLoader/Worlds/ModdedWorld1.wld
-      - autocreate=2
-      - worldname=ModdedWorld1
-      - difficulty=1
-      - password=passworld
-      - motd="Welcome to hexlo's server! :)"
+      - AUTOCREATE=1
+      - WORLDNAME=tmlCalamity1.wld
+      - DIFFICULTY=1
+      # - WORLD=/home/tml/.local/share/Terraria/tModLoader/Worlds/tmlCalamity1.wld
+      - PASSWORD=passworld
+      - MOTD="Welcome to my tModLoader Server :)"

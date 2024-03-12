@@ -1,188 +1,66 @@
-FROM ubuntu:jammy
+FROM steamcmd/steamcmd:alpine-3
 
-ARG VERSION=latest
+# Install prerequisites
+RUN apk update \
+ && apk add --no-cache bash curl tmux libstdc++ libgcc icu-libs bash tmux \
+ && rm -rf /var/cache/apk/*
 
-ENV TERRARIA_VERSION=$VERSION
+# Fix 32 and 64 bit library conflicts
+RUN mkdir /steamlib \
+ && mv /lib/libstdc++.so.6 /steamlib \
+ && mv /lib/libgcc_s.so.1 /steamlib
+ENV LD_LIBRARY_PATH /steamlib
 
-ENV LATEST_VERSION=""
+# Set a specific tModLoader version, defaults to the latest Github release
+ARG TML_VERSION
 
-ENV PATH="/scripts:${PATH}"
+# Create tModLoader user and drop root permissions
+ARG UID=1000
+ARG GID=1000
+RUN addgroup -g $GID tml \
+ && adduser tml -u $UID -G tml -h /home/tml -D
 
-ENV BASE_PATH=/root/.local/share/Terraria/ModLoader
+USER tml
+ENV USER tml
+ENV HOME /home/tml
+WORKDIR $HOME
 
-ENV MODS_DIR=${BASE_PATH}/Mods
+# Adding Scripts to PATH
+ENV SCRIPTS_PATH="/home/tml/.local/share/Terraria/tModLoader/Scripts"
+ENV PATH="${SCRIPTS_PATH}:${PATH}"
 
-ENV WORLDS_DIR=${BASE_PATH}/Worlds
+# Using Environment variables for server config by default. If you would like to use a serverconfig.txt file instead, uncomment the following variable or use it in your docker-compose.yml environment section.
+# ENV USE_CONFIG_FILE=1
 
-ENV PLAYERS_DIR=${BASE_PATH}/Players
+# Environment variables for server settings
+ENV WORLD=""
+ENV AUTOCREATE="1"
+ENV SEAD=""
+ENV WORLDNAME="tmlWorld.wld"
+ENV DIFFICULTY="1"
+ENV MAXPLAYERS="16"
+ENV PORT="7777"
+ENV PASSWORD=""
+ENV MOTD=""
+ENV WORLDPATH="/home/tml/.local/share/Terraria/tModLoader/Worlds/"
+ENV BANLIST="banlist.txt"
+ENV SECURE="1"
+ENV LANGUAGE="en/US"
+ENV UPNP="1"
+ENV NPCSTREAM="1"
+ENV PRIORITY=""
 
-ENV VERSION_FILE=${BASE_PATH}/versions.txt
+# Update SteamCMD and verify latest version
+RUN steamcmd +quit
 
-ENV TMODLOADER_VERSION=""
+# ADD --chown=tml:tml https://raw.githubusercontent.com/tModLoader/tModLoader/1.4.4/patches/tModLoader/Terraria/release_extras/DedicatedServerUtils/manage-tModLoaderServer.sh .
 
-RUN mkdir -p ${MODS_DIR} ${WORLDS_DIR} ${PLAYERS_DIR} /scripts && \
-    touch ${VERSION_FILE}
+# If you need to make local edits to the management script copy it to the same
+# directory as this file, comment out the above line and uncomment this line:
+COPY --chown=tml:tml manage-tModLoaderServer.sh .
 
-WORKDIR ${BASE_PATH}
+RUN ./manage-tModLoaderServer.sh install-tml --github --tml-version $TML_VERSION
 
-COPY ./.scripts /scripts
+EXPOSE 7777
 
-RUN chmod +x /scripts/*
-
-RUN mv /scripts/init-tModLoaderServer.sh ${BASE_PATH}
-
-RUN apt update -y && apt install -y unzip curl findutils
-
-RUN if [ "${TERRARIA_VERSION}" = "latest" ]; then \
-        echo "using latest version." \
-    &&  export LATEST_VERSION=$(get-terraria-version.sh) \
-    &&  export TERRARIA_VERSION=${LATEST_VERSION}; fi \
-    && echo "TERRARIA_VERSION=${TERRARIA_VERSION}" \
-    && echo "${TERRARIA_VERSION}" > ${BASE_PATH}/terraria-version.txt \
-    && curl https://terraria.org/api/download/pc-dedicated-server/terraria-server-${TERRARIA_VERSION}.zip --output terraria-server.zip \  
-    && unzip terraria-server.zip -d ${BASE_PATH} && mv ${BASE_PATH}/*/* ${BASE_PATH} \
-    && rm -rf terraria-server.zip ${BASE_PATH}/Mac ${BASE_PATH}/Windows ${BASE_PATH}/${TERRARIA_VERSION} \
-    && mv ${BASE_PATH}/Linux/* ${BASE_PATH}/ \
-    && rm -rf ${BASE_PATH}/Linux \
-    && cd ${BASE_PATH} \
-    && chmod +x TerrariaServer.bin.x86_64*
-
-### TModLoader Installation and Setup
-# Logic
-
-# Get Terraria Server Version
-RUN export TERRARIA_VERSION=$(get-terraria-version.sh | sed 's/[0-9]/&./g' | sed 's#.$##') \
-    echo "terrariaServer=${TERRARIA_VERSION}" | tee -a ${VERSION_FILE}
-
-# # tModLoader
-# RUN output=$(/scripts/get-tmodloader-1_3.sh) \
-#     && echo ${output} | tee -a ${VERSION_FILE} \
-#     && unzip -o tmodloader-server.zip -d ${BASE_PATH}/ \
-#     && rm tmodloader-server.zip \
-#     && chmod +x ${BASE_PATH}/tModLoaderServer*
-
-## Fixed tModLoader Version: v0.11.8.9 (last 1.3 version)
-RUN curl -L --silent https://github.com/tModLoader/tModLoader/releases/download/v0.11.8.9/tModLoader.Linux.v0.11.8.9.zip \
-    --output tmodloader-server.zip \
-    && echo "tModLoader: v0.11.8.9" | tee -a ${VERSION_FILE} \
-    && unzip -o tmodloader-server.zip -d ${BASE_PATH}/ \
-    && rm tmodloader-server.zip \
-    && chmod +x ${BASE_PATH}/tModLoaderServer*
-
-# AlchemistNPC
-RUN mkdir -pv ${MODS_DIR} && ls -alh ${MODS_DIR}
-
-RUN output=$(get-mod.sh https://github.com/VVV101/AlchemistNPC ${MODS_DIR} AlchemistNPC) \
-    && echo ${output} | tee -a ${VERSION_FILE}
-
-# AlchemistNPClite
-RUN output=$(get-mod.sh https://github.com/VVV101/AlchemistNPCLite ${MODS_DIR} AlchemistNPClite) \
-    && echo ${output} | tee -a ${VERSION_FILE}
-
-# BossChecklist Mod
-RUN output=$(get-mod.sh https://github.com/JavidPack/BossChecklist ${MODS_DIR} BossChecklist) \
-    && echo ${output} | tee -a ${VERSION_FILE}
-
-# CalamityMod 
-RUN output=$(get-mod.sh https://github.com/MountainDrew8/CalamityMod ${MODS_DIR} CalamityMod) \
-    && echo ${output} | tee -a ${VERSION_FILE}
-
-# CalamityMusicMod
-RUN output=$(get-mod.sh https://github.com/CalamityTeam/CalamityModMusicPublic ${MODS_DIR} CalamityMusicMod) \
-    && echo ${output} | tee -a ${VERSION_FILE}
-
-# ExtensibleInventory
-RUN output=$(get-mod.sh https://github.com/hamstar0/tml-extensibleinventory-mod ${MODS_DIR} ExtensibleInventory) \
-    && echo ${output} | tee -a ${VERSION_FILE}
-
-# Fargowiltas
-RUN output=$(get-mod.sh https://github.com/Fargowilta/Fargowiltas ${MODS_DIR} Fargowiltas) \
-    && echo ${output} | tee -a ${VERSION_FILE}
-
-# FargowiltasSouls
-RUN output=$(get-mod.sh https://github.com/Fargowilta/FargowiltasSouls ${MODS_DIR} FargowiltasSouls) \
-    && echo ${output} | tee -a ${VERSION_FILE}
-
-# FargowiltasSoulsDLC
-RUN output=$(get-mod.sh https://github.com/Fargowilta/FargowiltasSoulsDLC ${MODS_DIR} FargowiltasSoulsDLC) \
-    && echo ${output} | tee -a ${VERSION_FILE}
-
-# MagicStorageExtra
-RUN output=$(get-mod.sh https://github.com/ExterminatorX99/MagicStorageExtra ${MODS_DIR} MagicStorageExtra) \
-    && echo ${output} | tee -a ${VERSION_FILE}
-
-# RecipeBrowser
-RUN output=$(get-mod.sh https://github.com/JavidPack/RecipeBrowser ${MODS_DIR} RecipeBrowser) \
-    && echo ${output} | tee -a ${VERSION_FILE}
-    
-# SpiritMod
-RUN output=$(/scripts/get-mod.sh https://github.com/PhoenixBladez/SpiritMod ${MODS_DIR} SpiritMod) \
-    && echo ${output} | tee -a ${VERSION_FILE}   
-
-# TerrariaOverhaul
-RUN output=$(get-mod.sh https://github.com/Mirsario/TerrariaOverhaul ${MODS_DIR} TerrariaOverhaul) \
-    && echo ${output} | tee -a ${VERSION_FILE}
-
-# ThoriumMod
-RUN output=$(get-mod.sh https://github.com/SamsonAllen13/ThoriumMod ${MODS_DIR} ThoriumMod) \
-    && echo ${output} | tee -a ${VERSION_FILE}
-
-# Tremor
-RUN output=$(get-mod.sh https://github.com/IAmBatby/Tremor ${MODS_DIR} Tremor) \
-    && echo ${output} | tee -a ${VERSION_FILE}
-
-# WingSlot
-RUN output=$(get-mod.sh https://github.com/abluescarab/tModLoader-WingSlot ${MODS_DIR} WingSlot) \
-    && echo ${output} | tee -a ${VERSION_FILE}
-
-# WMITF
-RUN output=$(get-mod.sh https://github.com/gardenappl/WMITF ${MODS_DIR} WMITF) \
-    && echo ${output} | tee -a ${VERSION_FILE}
-
-RUN touch ${MODS_DIR}/enabled.json \
-    && echo '[' >> enabled.json \
-    && echo '   "BossChecklist",' >> enabled.json \
-    && echo '   "MagicStorageExtra",' >> enabled.json \
-    && echo '   "RecipeBrowser",' >> enabled.json \
-    && echo '   "ThoriumMod"' >> enabled.json \
-    && echo ']' >> enabled.json
-
-### Image variables
-
-ENV autocreate=2
-
-ENV seed=
-
-ENV worldname=TerrariaWorld
-
-ENV difficulty=0
-
-ENV maxplayers=16
-
-ENV port=7777
-
-ENV password=''
-
-ENV motd="Welcome!"
-
-ENV worldpath=${WORLDS_DIR}/
-
-ENV banlist=banlist.txt
-
-ENV secure=1
-
-ENV language=en/US
-
-ENV upnp=1
-
-ENV npcstream=1
-
-ENV priority=1
-
-# Logic
-
-WORKDIR ${BASE_PATH}
-
-VOLUME ["/root/.local/share/Terraria/ModLoader/Worlds"]
-
-ENTRYPOINT [ "./init-tModLoaderServer.sh" ]
+ENTRYPOINT [ "entrypoint.sh" ]

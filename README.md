@@ -24,14 +24,6 @@
 hexlo/terraria-tmodloader-server:latest
 ```
 
-<p style="color:#0078d7; font-family: Consolas">
-  <ins> Github image: </ins>
-</p>
-
-```
-ghcr.io/hexlo/terraria-tmodloader-server:latest
-```
-
 <br>
 
 ---
@@ -43,12 +35,12 @@ ghcr.io/hexlo/terraria-tmodloader-server:latest
 **_Server-side:_**
 
 - Docker
-- docker-compose
+- docker compose
 
 **_Client-side:_**
 
-- Terraria
-- tModLoader
+- Terraria 1.4.4 or Greater
+- tModLoader 1.4.4 or Greater
 
 <br>
 
@@ -62,37 +54,48 @@ ghcr.io/hexlo/terraria-tmodloader-server:latest
 - Create a `docker-compose.yml` file (see example below).  
 You can otherwise rename `docker-compose-example.yml` to `docker-compose.yml` and modify it.
 - Edit the environment variables as you see fit. They are explained in a table further down.
-- Edit the enabled.json to include the mods you want. Check below for available mods.
-
+- In the tModLoader/Mods directory, edit the install.txt and enabled.json to include the mods you want. Check below for examples.
+- This image uses Environment Variables to setup the server configuration file. You can instead use a serverconfig.txt file to overwrite this behavior if you wish. You need to set (uncomment) the `USE_CONFIG_FILE=1`
+variable in the Dockerfile file.
 <br>
+
+## <ins> **Generating your World** </ins>
+
+The easiest way to generate a world is to use certain Environment Variables to autocreate a world on container startup. Here are the variables required to do so:
+
+- AUTOCREATE=1
+- WORLDNAME=YourWorld.wld
+- DIFFICULTY=1
+
+All the variables are explained in the [Environment Variables](#environment-variables) section below.
 
 ### **_docker-compose.yml example:_**
 
 ```
 services:
-  terraria-tmodloader-server1:
-    # Github mirror: ghcr.io/hexlo/terraria-tmodloader-server:latest
-    image: hexlo/terraria-tmodloader-server:latest
-    container_name: terraria-tmodloader-server1
-    restart: unless-stopped
-    stdin_open: true
+  tml:
+    container_name: tml
+    #restart: unless-stopped
+    build:
+      context: .
+      args:
+        UID: 1000
+        GID: 1000
+        #TML_VERSION: v2023.8.3.3
+    #entrypoint: [ "/bin/bash" ] # Uncomment this line if you need to poke around in the container
     tty: true
+    stdin_open: true
     ports:
-      - 7782:7777
+      - 7785:7777
     volumes:
-      - type: bind
-        source: ./Worlds
-        target: /root/.local/share/Terraria/ModLoader/Worlds/
-      - type: bind
-        source: ./enabled.json
-        target: /root/.local/share/Terraria/ModLoader/Mods/enabled.json
+      - ./tModLoader:/home/tml/.local/share/Terraria/tModLoader
     environment:
-      - world=/root/.local/share/Terraria/ModLoader/Worlds/Calamity0.wld
-      - autocreate=2
-      - worldname=Calamity0
-      - difficulty=1
-      - password=calamity
-      - motd="Welcome to hexlo's server! :)"
+      - AUTOCREATE=1
+      - WORLDNAME=tmlCalamity1.wld
+      - DIFFICULTY=1
+      # - WORLD=/home/tml/.local/share/Terraria/tModLoader/Worlds/tmlCalamity1.wld
+      - PASSWORD=passworld
+      - MOTD="Welcome to my tModLoader Server :)"
 ```
 
 - Launch the container. If you are using a command line interface (cli):  
@@ -109,8 +112,7 @@ services:
 ### **_Using existing worlds_**
 
 Terraria tModloader worlds are comprised of two files: a `.wld` and a `.twld`  
-If you have a Terraria tModloader compatible world already, you can simply put the two files in the `Worlds` directory.  
-_Note: worlds created with terraria 1.4 or newer are not compatible with tModLoader's current version_
+If you have a Terraria tModloader compatible world already, you can simply put the two files in the `Worlds` directory.
 
 ### **_Creating a new world_**
 
@@ -119,38 +121,49 @@ There is two ways to create a new world.
 1. Using variables in the `docker-compose.yml` file (recommended)
 2. By spinning a container, manually attaching to it and going through the command prompts of the terraria server.
 
-<ins> 1. Using variables in the docker-compose.yml file: </ins>
+### <ins> 1. Using variables in the docker-compose.yml file: </ins>
 
 You need to set certain variables in the `environment:` part of the docker-compose.yml file, as follows:
 
 ```
 ...
     environment:
-      - world=/root/.local/share/Terraria/ModLoader/Worlds/Calamity0.wld
-      - autocreate=2
-      - worldname=Calamity0
-      - difficulty=1
+      - AUTOCREATE=1
+      - WORLDNAME=tmlCalamity1.wld
+      - DIFFICULTY=1
 ...
 ```
 
-_Note: the description and possible values of these variables are described in a table below_
+_Note: the description and possible values of these variables are described in the [Environment Variables](#environment-variables) section below_
 
-<ins> 2. Manually create a world: </ins>
+### <ins> 2. Manually create a world: </ins>
 
-You can create a new world or select different world served by a container by attaching to it.  
-`docker attach <container-name>`
+You can create a new world or select different world served by a container by attaching to it. Make sure no Environment variables are used. Delete or comment the `environment:` section of the docker-compose.yml file.
+
+`docker exec -it <container-name> tmux a`
+
+if you used the docker-compose.yml provided, the container name is 'tml'. You can then use
+
+`docker exec -it tml tmux a`
 
 - press enter
 - Go through the options
 
 To dettach without stopping the container:
-`ctrl+p ctrl+q`
+`ctrl+b` + `d`
 
 <br>
 
 ### **Important!**
 
-If you want the server to start automatically on subsequent runs, you need to provide a world path to an existing world, by defining the environment variable `world` as shown in the exemple above.
+If you want the server to start automatically on subsequent runs, you need to provide a world path to an existing world, by defining the environment variable `world`. You can also safely remove the variables used to autocreate your world. Here is an example of the `environment:` section:
+
+```
+    environment:
+      - WORLD=/home/tml/.local/share/Terraria/tModLoader/Worlds/tmlCalamity1.wld
+      - PASSWORD=passworld
+      - MOTD="Welcome to my tModLoader Server :)"
+```
 
 <br>
 
@@ -160,40 +173,32 @@ If you want the server to start automatically on subsequent runs, you need to pr
 
 ## <ins> **Mods** </ins>
 
-Mods included in this image:
+You can install Mods by providing Steam Workshop IDs in the `install.txt` file located in `tModLoader/Mods/install.txt`. You can find the Mod ID in the URL of the Mod. For example, the [Calamity Mod](https://steamcommunity.com/sharedfiles/filedetails/?id=2824688072)'s ID is **2824688072**. 
 
-- [AlchemistNPC](https://github.com/VVV101/AlchemistNPC)
-- [AlchemistNPClite](https://github.com/VVV101/AlchemistNPCLite)
-- [BossChecklist](https://github.com/JavidPack/BossChecklist)
-- [CalamityMod](https://github.com/MountainDrew8/CalamityMod)
-- [CalamityMusicMod](https://github.com/CalamityTeam/CalamityModMusicPublic)
-- [ExtensibleInventory](https://github.com/hamstar0/tml-extensibleinventory-mod)
-- [Fargowiltas](https://github.com/Fargowilta/Fargowiltas)
-- [FargowiltasSouls](https://github.com/Fargowilta/FargowiltasSouls)
-- [FargowiltasSoulsDLC](https://github.com/Fargowilta/FargowiltasSoulsDLC)
-- [MagicStorageExtra](https://github.com/ExterminatorX99/MagicStorageExtra)
-- [RecipeBrowser](https://github.com/JavidPack/RecipeBrowser)
-- [SpiritMod](https://github.com/PhoenixBladez/SpiritMod)
-- [TerrariaOverhaul](https://github.com/Mirsario/TerrariaOverhaul)
-- [ThoriumMod](https://github.com/SamsonAllen13/ThoriumMod)
-- [Tremor](https://github.com/IAmBatby/Tremor)
-- [WingSlot](https://github.com/abluescarab/tModLoader-WingSlot)
-- [WMITF](https://github.com/gardenappl/WMITF)
-<!-- end of the list -->
+*install.txt* example:
+```
+2824688072
+2824688266
+2909886416
+2619954303
+2669644269
+2570931073
+2815540735
+3044249615
+2599842771
+2802867430
+```
 
-_Note: If you would like mods that are not here, please let me know and I'll try my best to add them._
+To enable or disable mods on the server, modify the `enabled.json` file located in `tModLoader/Mods/enabled.json` with the names of the mods. Some mods may clash with each others, especially big content mods. Refer to the mod's wiki for more info.
 
-To enable or disable mods on the server, modify the `enabled.json` file with the names of the mods (the exact names as above). This needs to be done before starting the container.  
-Some mods may clash with each others, especially big content mods. Refer to the mod's wiki for more info.
-
-<ins>`enabled.json` example: </ins>
+<ins>*enabled.json* example: </ins>
 
 ```
 [
+  "CalamityMod",
+  "CalamityModMusic",
   "BossChecklist",
-  "MagicStorageExtra",
-  "RecipeBrowser",
-  "ThoriumMod"
+  "RecipeBrowser"
 ]
 ```
 
@@ -205,22 +210,10 @@ _Notes; The array of mod's names need the following properties:_
 - There needs to be no trailing comma after the last item in the array
   <br>
 
-### <ins> **Important!**
+The *install.txt* and *enabled.json* files need to be modidied before building the image.
 
-<ins> On the Client (your computer): </ins>
 
-> You need tModLoader to play on this version of the server. Download it through steam and keep it up to date.
 
-<ins> On the server: </ins>
-
-> If the server gets out of date, make sure you recreate the container to update it.  
-> Worlds and players created with 1.4 or newer will not work with this version of tModLoader.
-
-<br>
-
----
-
-<br>
 
 ## <ins> **_Environment Variables_** </ins>
 
@@ -249,12 +242,12 @@ _Note: These are case-sensitive!_
 
 ### <ins> **Important!** </ins>
 
-- If the `world` variable is left empty or not included, the server will need to be initialized manually after the container is spun up. You will need to attach to the container and select/create a world and set the players number, port and password manually. If you create a new world, it will be saved in the path defined by the environment variable `worldpath`.
+- If the `WORLD` variable is left empty or not included, the server will need to be initialized manually after the container is spun up. You will need to attach to the container and select/create a world and set the players number, port and password manually. If you create a new world, it will be saved in the path defined by the environment variable `worldpath`.
 
-1.  `docker attach <container name>`
+1.  `docker exec -it <container-name> tmux a`
 2.  press _*enter*_
 3.  Go through the options
-4.  Detach from the container by pressing `ctrl+p` + `ctrl+q`
+4.  Detach from the container by pressing `ctrl+b` + `d`
 
 - If, after creating your world with a specific seed, the server still doesn't initializes automatically, be sure to comment or remove the `seed=<yourseed>` variable in the docker-compose.yml file.
 
@@ -264,10 +257,15 @@ _Note: These are case-sensitive!_
 
 <br>
 
-## <ins> **List of server-side console commands from the [unofficial wiki](https://terraria.fandom.com/wiki/Server#Server_files)** </ins>
+## <ins> *Server console commands* </ins>
 
-Once a dedicated server is running, the following commands can be run.\
-First, attach to the container with `docker attach <container name>`.
+Once a server is running, the following commands can be run. More info on the [Terraria Server Wiki](https://terraria.fandom.com/wiki/Server#Server_files)\
+You can either attach to the container or inject a command.
+1. To attach to the container, use `docker exec -it <container-name> tmux a`.
+
+2. To inject a command, from the command line, use `docker exec <container-name> inject "command"`.
+For example, to send a message to everyone on the server:
+`docker exec tml inject "say Hello everyone!"`
 
 ```
 
