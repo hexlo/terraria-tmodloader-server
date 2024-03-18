@@ -1,14 +1,14 @@
 services:
   tml:
     container_name: tml
-    #restart: unless-stopped
+    restart: unless-stopped
     build:
       context: .
       args:
         UID: 1000
         GID: 1000
-        #TML_VERSION: v2023.8.3.3
-    #entrypoint: [ "/bin/bash" ] # Uncomment this line if you need to poke around in the container
+        # TML_VERSION: v2023.8.3.3
+    # entrypoint: [ "/bin/bash" ] # Uncomment this line if you need to poke around in the container
     tty: true
     stdin_open: true
     ports:
@@ -16,9 +16,11 @@ services:
     volumes:
       - ./tModLoader:/home/tml/.local/share/Terraria/tModLoader
     environment:
+      ### Comment the variable 'WORLD' to create a new world (Using AUTOCREATE, WORLDNAME, DIFFICULTY and SEED)
+      ### Uncomment the variable 'WORLD' to use an existing world. This will ebable the server to start with no user interaction through the cli.
+      # - WORLD=/home/tml/.local/share/Terraria/tModLoader/Worlds/tmlCalamity1.wld
       - AUTOCREATE=1
       - WORLDNAME=tmlCalamity1.wld
       - DIFFICULTY=1
-      # - WORLD=/home/tml/.local/share/Terraria/tModLoader/Worlds/tmlCalamity1.wld
       - PASSWORD=passworld
       - MOTD="Welcome to my tModLoader Server :)"
