@@ -36,7 +36,9 @@ if [[ -z ${USE_CONFIG_FILE} ]]; then
     echo "priority=${PRIORITY}" >> ${configFile};
 
     ### tModLoader Specifics
-    # echo "modpath=${MODPATH}" >> ${configFile}
+    if [[ -n "${MODPATH}" ]]; then
+        echo "modpath=${MODPATH}" >> ${configFile}
+    fi
 
 else
     echo "create-config.sh: Using provided serverconfig.txt"
