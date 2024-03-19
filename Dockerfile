@@ -50,6 +50,9 @@ ENV UPNP="1"
 ENV NPCSTREAM="1"
 ENV PRIORITY=""
 
+# ENV MODPATH="/home/tml/.local/share/Terraria/tModLoader/Mods/"
+
+
 # Update SteamCMD and verify latest version
 RUN steamcmd +quit
 

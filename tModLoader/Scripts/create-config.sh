@@ -35,6 +35,9 @@ if [[ -z ${USE_CONFIG_FILE} ]]; then
     echo "npcstream=${NPCSTREAM}" >> ${configFile}
     echo "priority=${PRIORITY}" >> ${configFile};
 
+    ### tModLoader Specifics
+    # echo "modpath=${MODPATH}" >> ${configFile}
+
 else
     echo "create-config.sh: Using provided serverconfig.txt"
 fi;
