@@ -9,17 +9,14 @@ if [[ -z ${USE_CONFIG_FILE} ]]; then
     echo > ${configFile}
 
     if [[ ! -z "${WORLD}" ]]; then
-        echo "in if statement"
         echo "world=${WORLD}" >> ${configFile}
     else
-        echo "in else statement"
         echo "world=${tmlPath}/Worlds/${WORLDNAME}" >> ${configFile}
         echo "autocreate=${AUTOCREATE}" >> ${configFile}
         echo "seed=${SEAD}" >> ${configFile}
         echo "worldname=${WORLDNAME}" >> ${configFile}
         echo "difficulty=${DIFFICULTY}" >> ${configFile}
     fi
-    echo "outside world checking"
     echo "maxplayers=${MAXPLAYERS}" >> ${configFile}
     echo "port=${PORT}" >> ${configFile}
     echo "password=${PASSWORD}" >> ${configFile}
