@@ -1,9 +1,11 @@
 [
   "CalamityMod",
   "CalamityModMusic",
-  "BossChecklist",
   "RecipeBrowser",
+  "BossChecklist",
   "BossCursor",
   "Lights",
-  "ImprovedTorches"
+  "ImprovedTorches",
+  "OreExcavator",
+  "MagicStorage"
 ]
